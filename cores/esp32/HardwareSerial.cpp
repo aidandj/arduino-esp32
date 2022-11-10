@@ -22,11 +22,11 @@
 #define TX2 17
 #endif
 
-// #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SERIAL)
-// HardwareSerial Serial(0);
-// HardwareSerial Serial1(1);
-// HardwareSerial Serial2(2);
-// #endif
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SERIAL)
+HardwareSerial RealSerial(0);
+HardwareSerial Serial1(1);
+HardwareSerial Serial2(2);
+#endif
 
 bool  RLJMODS_HardwareSerial() {};
 
