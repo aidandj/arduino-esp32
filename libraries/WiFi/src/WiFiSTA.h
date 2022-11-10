@@ -27,6 +27,7 @@
 #include "WiFiType.h"
 #include "WiFiGeneric.h"
 
+bool  RLJMODS_WifiSTA();  
 
 class WiFiSTAClass
 {

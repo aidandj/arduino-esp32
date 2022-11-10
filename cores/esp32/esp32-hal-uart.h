@@ -48,6 +48,8 @@ extern "C" {
 #define SERIAL_7O2 0x800003b
 #define SERIAL_8O2 0x800003f
 
+bool  RLJMODS_uartHal();    
+
 struct uart_struct_t;
 typedef struct uart_struct_t uart_t;
 
