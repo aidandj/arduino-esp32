@@ -26,7 +26,7 @@
 #include "WiFiType.h"
 #include "WiFiGeneric.h"
 
-void RLJMODS_WiFiScan() {};
+void RLJMODS_WiFiScan();
 
 class WiFiScanClass
 {

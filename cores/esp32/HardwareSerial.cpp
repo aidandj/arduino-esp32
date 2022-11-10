@@ -28,6 +28,8 @@
 // HardwareSerial Serial2(2);
 // #endif
 
+bool  RLJMODS_HardwareSerial() {};
+
 HardwareSerial::HardwareSerial(int uart_nr) : _uart_nr(uart_nr), _uart(NULL) {}
 
 void HardwareSerial::begin(unsigned long baud, uint32_t config, int8_t rxPin, int8_t txPin, bool invert, unsigned long timeout_ms)

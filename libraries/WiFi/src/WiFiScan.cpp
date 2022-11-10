@@ -48,6 +48,8 @@ uint32_t WiFiScanClass::_scanTimeout = 10000;
 uint16_t WiFiScanClass::_scanCount = 0;
 void* WiFiScanClass::_scanResult = 0;
 
+void RLJMODS_WiFiScan() {};
+
 /**
  * Start scan WiFi networks available
  * @param async         run in async mode
