@@ -48,15 +48,13 @@ uint32_t WiFiScanClass::_scanTimeout = 10000;
 uint16_t WiFiScanClass::_scanCount = 0;
 void* WiFiScanClass::_scanResult = 0;
 
-void RLJMODS_WiFiScan() {};
-
 /**
  * Start scan WiFi networks available
  * @param async         run in async mode
  * @param show_hidden   show hidden networks
  * @return Number of discovered networks
  */
-int16_t WiFiScanClass::scanNetworks(bool async, bool show_hidden, bool passive, uint32_t max_ms_per_chan, uint8_t channel)
+int16_t WiFiScanClass::scanNetworks(bool async, bool show_hidden, bool passive, uint32_t max_ms_per_chan, uint8_t channel, const char* ssid)
 {
     if(WiFiGenericClass::getStatusBits() & WIFI_SCANNING_BIT) {
         return WIFI_SCAN_RUNNING;
