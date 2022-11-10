@@ -282,7 +282,12 @@ uint32_t uartAvailable(uart_t* uart)
     if(uart == NULL || uart->queue == NULL) {
         return 0;
     }
-    return (uxQueueMessagesWaiting(uart->queue) + uart->dev->status.rxfifo_cnt) ;
+    if (uart->dev->status.rxfifo_cnt > 0)
+    {
+    	uartRxFifoToQueue(uart);
+    }
+    uint32_t len = uxQueueMessagesWaiting(uart->queue);
+    return len;
 }
 
 uint32_t uartAvailableForWrite(uart_t* uart)
@@ -318,7 +323,7 @@ uint8_t uartRead(uart_t* uart)
         return 0;
     }
     uint8_t c;
-    if ((uxQueueMessagesWaiting(uart->queue) == 0) && (uart->dev->status.rxfifo_cnt > 0))
+    if (uart->dev->status.rxfifo_cnt > 0)
     {
     	uartRxFifoToQueue(uart);
     }
@@ -334,7 +339,7 @@ uint8_t uartPeek(uart_t* uart)
         return 0;
     }
     uint8_t c;
-    if ((uxQueueMessagesWaiting(uart->queue) == 0) && (uart->dev->status.rxfifo_cnt > 0))
+    if (uart->dev->status.rxfifo_cnt > 0)
     {
     	uartRxFifoToQueue(uart);
     }

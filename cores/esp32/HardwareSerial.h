@@ -112,8 +112,21 @@ protected:
 
 extern void serialEventRun(void) __attribute__((weak));
 
+bool  RLJMODS_HardwareSerial();                       // compile time check that library has not been defaulted
+size_t defaultSerialInterceptWrite(uint8_t);          
+
+class SerialIntercept : public HardwareSerial {
+	size_t (*callbackWrite)(uint8_t);
+public:
+    SerialIntercept(int uart_nr, size_t (*callback)(uint8_t) = defaultSerialInterceptWrite);
+    void setWriteCallback(size_t (*callback)(uint8_t));
+    size_t write(uint8_t);
+    size_t write(const uint8_t *buffer, size_t size);
+};
+
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SERIAL)
-extern HardwareSerial Serial;
+extern SerialIntercept Serial;      // intercept, instead of "HardwareSerial Serial"
+extern HardwareSerial RealSerial;   // stunt double to provide route to true Serial(0)
 extern HardwareSerial Serial1;
 extern HardwareSerial Serial2;
 #endif

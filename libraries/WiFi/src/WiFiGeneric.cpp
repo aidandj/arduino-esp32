@@ -22,6 +22,9 @@
 
  */
 
+#define ISSUE6359
+#define ISSUE2501
+
 #include "WiFi.h"
 #include "WiFiGeneric.h"
 
@@ -132,6 +135,7 @@ static bool wifiLowLevelInit(bool persistent){
     if(!lowLevelInitDone){
         tcpipInit();
         wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
+        cfg.nvs_enable = persistent;   // RLJMOD - prevent stupid NVS usage...
         esp_err_t err = esp_wifi_init(&cfg);
         if(err){
             log_e("esp_wifi_init %d", err);
@@ -367,6 +371,9 @@ const char * system_event_reasons[] = { "UNSPECIFIED", "AUTH_EXPIRE", "AUTH_LEAV
 #endif
 esp_err_t WiFiGenericClass::_eventCallback(void *arg, system_event_t *event, wifi_prov_event_t *prov_event)
 {
+#ifdef ISSUE6359
+    static bool first_connect = true;
+#endif
     if(WiFi.isProvEnabled()) {
         wifi_prov_mgr_event_handler(arg,event);        
     }
@@ -391,7 +398,16 @@ esp_err_t WiFiGenericClass::_eventCallback(void *arg, system_event_t *event, wif
         log_w("Reason: %u - %s", reason, reason2str(reason));
         if(reason == WIFI_REASON_NO_AP_FOUND) {
             WiFiSTAClass::_setStatus(WL_NO_SSID_AVAIL);
+#ifdef ISSUE2501            
+#ifdef ISSUE6359
+        } else if(reason == WIFI_REASON_AUTH_FAIL && !first_connect) {
+#else
+          // REF: https://github.com/espressif/arduino-esp32/issues/2501
+        } else if(reason == WIFI_REASON_AUTH_FAIL) {
+#endif
+#else
         } else if(reason == WIFI_REASON_AUTH_FAIL || reason == WIFI_REASON_ASSOC_FAIL) {
+#endif
             WiFiSTAClass::_setStatus(WL_CONNECT_FAILED);
         } else if(reason == WIFI_REASON_BEACON_TIMEOUT || reason == WIFI_REASON_HANDSHAKE_TIMEOUT) {
             WiFiSTAClass::_setStatus(WL_CONNECTION_LOST);
@@ -401,6 +417,34 @@ esp_err_t WiFiGenericClass::_eventCallback(void *arg, system_event_t *event, wif
             WiFiSTAClass::_setStatus(WL_DISCONNECTED);
         }
         clearStatusBits(STA_CONNECTED_BIT | STA_HAS_IP_BIT | STA_HAS_IP6_BIT);
+#ifdef ISSUE2501   
+#ifdef ISSUE6359         
+        log_w("Wifi Reconnect may run");
+        if(first_connect && ((reason == WIFI_REASON_AUTH_EXPIRE) ||
+        (reason >= WIFI_REASON_BEACON_TIMEOUT)))
+        {
+            log_w("Wifi Reconnect Running");
+            WiFi.disconnect();
+            WiFi.begin();
+            first_connect = false;
+        }
+        else if(WiFi.getAutoReconnect()) {
+#else
+        if(WiFi.getAutoReconnect()) {
+#endif
+            if((reason == WIFI_REASON_AUTH_EXPIRE) ||
+            (reason >= WIFI_REASON_BEACON_TIMEOUT && reason != WIFI_REASON_AUTH_FAIL)) 
+            {
+                log_d("WiFi AutoReconnect Running");
+                WiFi.disconnect();
+                WiFi.begin();
+            }
+
+        }
+        else if (reason == WIFI_REASON_ASSOC_FAIL) {
+            WiFiSTAClass::_setStatus(WL_CONNECT_FAILED);
+        }
+#else
         if(((reason == WIFI_REASON_AUTH_EXPIRE) ||
             (reason >= WIFI_REASON_BEACON_TIMEOUT && reason != WIFI_REASON_AUTH_FAIL)) &&
             WiFi.getAutoReconnect())
@@ -408,6 +452,7 @@ esp_err_t WiFiGenericClass::_eventCallback(void *arg, system_event_t *event, wif
             WiFi.disconnect();
             WiFi.begin();
         }
+#endif
     } else if(event->event_id == SYSTEM_EVENT_STA_GOT_IP) {
 #if ARDUHAL_LOG_LEVEL >= ARDUHAL_LOG_LEVEL_DEBUG
         uint8_t * ip = (uint8_t *)&(event->event_info.got_ip.ip_info.ip.addr);

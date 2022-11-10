@@ -48,6 +48,10 @@ uint32_t WiFiScanClass::_scanTimeout = 10000;
 uint16_t WiFiScanClass::_scanCount = 0;
 void* WiFiScanClass::_scanResult = 0;
 
+#ifdef RLJMODS
+
+void RLJMODS_WiFiScan() {};
+
 /**
  * Start scan WiFi networks available
  * @param async         run in async mode
@@ -76,6 +80,8 @@ int16_t WiFiScanClass::scanNetworks(bool async, bool show_hidden, bool passive, 
         config.scan_type = WIFI_SCAN_TYPE_PASSIVE;
         config.scan_time.passive = max_ms_per_chan;
     } else {
+        if(show_hidden)                                     // <<<<<<<<<<<<<<<<<<<<
+            config.ssid = (uint8_t*)ssid;                   // <<<<<<<<<<<<<<<<<<<<
         config.scan_type = WIFI_SCAN_TYPE_ACTIVE;
         config.scan_time.active.min = 100;
         config.scan_time.active.max = max_ms_per_chan;
