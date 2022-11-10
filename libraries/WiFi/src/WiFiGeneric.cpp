@@ -55,6 +55,8 @@ static xQueueHandle _network_event_queue;
 static TaskHandle_t _network_event_task_handle = NULL;
 static EventGroupHandle_t _network_event_group = NULL;
 
+bool  RLJMODS_WifiGeneric();    
+
 esp_err_t postToSysQueue(system_prov_event_t *data)
 {
     if (xQueueSend(_network_event_queue, &data, portMAX_DELAY) != pdPASS) {
