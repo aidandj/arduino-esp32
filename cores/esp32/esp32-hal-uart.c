@@ -67,7 +67,7 @@ static uart_t _uart_bus_array[3] = {
 };
 #endif
 
-bool  RLJMODS_HardwareSerial();    
+bool  RLJMODS_uartHal();    
 
 static void uart_on_apb_change(void * arg, apb_change_ev_t ev_type, uint32_t old_apb, uint32_t new_apb);
 

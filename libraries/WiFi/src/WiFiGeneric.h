@@ -30,6 +30,8 @@
 #include "IPAddress.h"
 #include <wifi_provisioning/manager.h>
 
+bool  RLJMODS_WifiGeneric();   
+
 typedef struct
 {
      wifi_prov_cb_event_t event;
